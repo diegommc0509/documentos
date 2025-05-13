@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Envio de Documentos</title>
+  <link rel="icon" href="ICONE.ico" type="image/x-icon">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <style>
+    :root {
+      --primary: #0077ff;
+      --bg: #f9f9f9;
+      --border: #ccc;
+      --radius: 8px;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: var(--bg);
+    }
+
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+    }
+
+    input[type="file"], input[type="text"], select {
+      display: block;
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background-color: #fff;
+    }
+
+    .required::after {
+      content: " *";
+      color: red;
+    }
+
+    .submit-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      font-size: 1rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      width: 100%;
+      margin-top: 1.5rem;
+      transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+      background-color: #005fd4;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .download-section {
+      margin-top: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Envio de Documentos</h2>
+    <form id="docsForm">
+      <div class="form-group">
+        <label class="required">INFORME O SEU NOME COMPLETO</label>
+        <input type="text" name="nome" id="nome" required />
+      </div>
+
+      <div class="form-group">
+        <label class="required">Certidão de Nascimento ou casamento</label>
+        <input type="file" name="certidao" required accept="application/pdf" />
+      </div>
+
+      <div class="form-group">
+        <label class="required">RG/CNH (Frente)</label>
+        <input type="file" name="rgFrente" required accept="application/pdf" />
+      </div>
+
+      <div class="form-group">
+        <label class="required">RG/CNH (Verso)</label>
+        <input type="file" name="rgVerso" required accept="application/pdf" />
+      </div>
+
+      <div class="form-group">
+        <label class="required">CPF</label>
+        <input type="file" name="cpf" accept="application/pdf" />
+      </div>
+	  <div class="form-group">
+        <label class="required">Ficha 19 ou diploma de Ensino Superior</label>
+        <input type="file" name="escolaridade" accept="application/pdf" />
+      </div>
+	  
+	 
+      <div class="form-group">
+        <label class="required">Comprovante de residência</label>
+        <input type="file" name="residencia" required accept="application/pdf" />
+      </div>
+
+      <div class="form-group">
+        <label>Reservista (homens)</label>
+        <input type="file" name="reservista" accept="application/pdf" />
+      </div>
+ 
+<div class="form-group">
+        <label>Certidão de nascimento de filho 1</label>
+        <input type="file" name="filho1" accept="application/pdf" />
+      </div>
+	  
+	  <div class="form-group">
+        <label>Cartão de vacina IDENTIFICAÇÃO(FRENTE)</label>
+        <input type="file" name="vacinafrente1" accept="application/pdf" />
+      </div>
+	   <div class="form-group">
+        <label>Cartão de vacina VACINAS(VERSO)</label>
+        <input type="file" name="vacinaverso1" accept="application/pdf" />
+      </div>
+	  
+	  <div class="form-group">
+        <label>Certidão de nascimento de filho 2</label>
+        <input type="file" name="filho2" accept="application/pdf" />
+      </div>
+	  
+	  <div class="form-group">
+        <label>Cartão de vacina IDENTIFICAÇÃO(FRENTE)</label>
+        <input type="file" name="vacinafrente2" accept="application/pdf" />
+      </div>
+	   <div class="form-group">
+        <label>Cartão de vacina VACINAS(VERSO)</label>
+        <input type="file" name="vacinaverso2" accept="application/pdf" />
+      </div>
+	  
+	  
+	  <div class="form-group">
+        <label>Certidão de nascimento de filho 3</label>
+        <input type="file" name="filho3" accept="application/pdf" />
+      </div>
+	  
+<div class="form-group">
+        <label>Cartão de vacina IDENTIFICAÇÃO(FRENTE)</label>
+        <input type="file" name="vacinafrente3" accept="application/pdf" />
+      </div>
+	  
+	   <div class="form-group">
+        <label>Cartão de vacina VACINAS(VERSO)</label>
+        <input type="file" name="vacinaverso3" accept="application/pdf" />
+      </div>
+	  
+      <button type="button" class="submit-btn" onclick="mergeDocs()">Unir e Baixar Documentos</button>
+    </form>
+
+    <div class="download-section" id="downloadSection"></div>
+  </div>
+
+  <script>
+  async function mergeDocs() {
+    const form = document.getElementById('docsForm');
+    const files = Array.from(form.querySelectorAll('input[type="file"]'))
+      .map(input => input.files[0])
+      .filter(file => file);
+
+    if (files.length === 0) {
+      alert('Selecione ao menos um documento PDF ou imagem.');
+      return;
+    }
+
+    const nome = document.getElementById('nome').value.trim() || 'documentos_unificados';
+    const mergedPdf = await PDFLib.PDFDocument.create();
+
+    for (const file of files) {
+      const fileType = file.type;
+
+      if (fileType === 'application/pdf') {
+        // Se for PDF, simplesmente adiciona as páginas
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await PDFLib.PDFDocument.load(arrayBuffer);
+        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+        copiedPages.forEach(p => mergedPdf.addPage(p));
+      } else if (fileType.startsWith('image/')) {
+        // Se for imagem, converte para página PDF
+        const imageBytes = await file.arrayBuffer();
+        let imageEmbed, imageDims;
+
+        if (fileType === 'image/jpeg' || fileType === 'image/jpg') {
+          imageEmbed = await mergedPdf.embedJpg(imageBytes);
+        } else {
+          imageEmbed = await mergedPdf.embedPng(imageBytes);
+        }
+
+        imageDims = imageEmbed.scale(1);
+
+        const page = mergedPdf.addPage([imageDims.width, imageDims.height]);
+        page.drawImage(imageEmbed, {
+          x: 0,
+          y: 0,
+          width: imageDims.width,
+          height: imageDims.height
+        });
+      } else {
+        alert(`Tipo de arquivo não suportado: ${file.name}`);
+      }
+    }
+
+    const pdfBytes = await mergedPdf.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+
+    const downloadSection = document.getElementById('downloadSection');
+    downloadSection.innerHTML = `
+      <p>Download do PDF Unificado:</p>
+      <a href="${url}" download="${nome}.pdf" style="color: var(--primary); font-weight: bold; text-decoration: underline;">⬇️ Baixar Documento</a>
+    `;
+  }
+</script>
+</body>
+</html>
